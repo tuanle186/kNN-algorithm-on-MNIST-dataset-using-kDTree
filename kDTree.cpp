@@ -34,7 +34,6 @@ kDTreeNode* kDTree::cloneTree(const kDTreeNode *node)
     return new kDTreeNode(node->data, cloneTree(node->left), cloneTree(node->right));
 }
 
-
 void kDTree::clearTree(kDTreeNode *node)
 {
     if (node != nullptr)
@@ -108,6 +107,7 @@ void kDTree::postorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     
     postorderTraversalHelper(node->left, isFirst);
     postorderTraversalHelper(node->right, isFirst);
+
     if (!isFirst) {
         cout << " ";
     } else {
@@ -129,31 +129,48 @@ void kDTree::postorderTraversal() const {
     postorderTraversalHelper(root, isFirst);
 }
 
-
-// Height of the tree
 int kDTree::height() const {
-    // Implement height calculation
-    return 0;
+    return heightHelper(root);
 }
 
-// Count of nodes in the tree
+int kDTree::heightHelper(kDTreeNode *node) const {
+    if (node == nullptr)
+        return 0;
+    return 1 + max(heightHelper(node->left), heightHelper(node->right));
+}
+
 int kDTree::nodeCount() const {
-    // Implement node count
-    return 0;
+    return nodeCountHelper(root);
 }
 
-// Count of leaf nodes in the tree
-int kDTree::leafCount() const {
-    // Implement leaf count
-    return 0;
+int kDTree::nodeCountHelper(kDTreeNode *node) const {
+    if (node == nullptr)
+        return 0;
+    return 1 + nodeCountHelper(node->left) + nodeCountHelper(node->right);
 }
+
+
+int kDTree::leafCount() const {
+    return leafCountHelper(root);
+}
+
+int kDTree::leafCountHelper(kDTreeNode *node) const {
+    if (node == nullptr)
+        return 0;
+    if (node->left == nullptr && node->right == nullptr)
+        return 1;
+    return leafCountHelper(node->left) + leafCountHelper(node->right);
+}
+
 
 void kDTree::insert(const vector<int> &point) {
+    if (point.size() != k) {
+        return;
+    }
     root = insertHelper(root, point, 0);
 }
 
 kDTreeNode* kDTree::insertHelper(kDTreeNode* node, const vector<int> &point, int depth) {
-    // If the current node is null, create a new node with the point
     if (node == nullptr) {
         return new kDTreeNode(point);
     }

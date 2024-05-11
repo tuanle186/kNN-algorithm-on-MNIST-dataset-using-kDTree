@@ -126,7 +126,7 @@ void tc8() {
 void tc9() {
     // (5, 6), (2, 2), (7, 3), (2, 8), (8, 7), (8, 1), (9, 4), (3, 5)
     kDTree myTree;
-    vector<int> point1({5, 6});
+    vector<int> point1({5, 6, 3});
     vector<int> point2({2, 2});
     vector<int> point3({7, 3});
     vector<int> point4({2, 8});
@@ -143,12 +143,18 @@ void tc9() {
     myTree.insert(point6);
     myTree.insert(point7);
     myTree.insert(point8);
+    cout << "preOrder: ";
     myTree.preorderTraversal();
     cout << "end" << endl;
+    cout << "inOrder: ";
     myTree.inorderTraversal();
     cout << "end" << endl;
+    cout << "postOrder:";
     myTree.postorderTraversal();
     cout << "end" << endl;
+
+    cout << "Height: " << myTree.height() << endl;
+    cout << "Node count: " << myTree.nodeCount() << endl;
 }
 
 int main(int argc, const char *argv[])
