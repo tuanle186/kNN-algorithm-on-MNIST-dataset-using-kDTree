@@ -3,18 +3,16 @@
 /* TODO: You can implement methods, functions that support your data structures here.
  * */
 
-// Constructor
-kDTree::kDTree(int k) : k(k), root(nullptr) {}
+kDTree::kDTree(int k) {
+    this->k = k;
+    this->root = nullptr;
+}
 
-// Destructor
 kDTree::~kDTree() {
-    // Implement destructor
     clearTree(root);
 }
 
-// Copy Assignment Operator
 const kDTree &kDTree::operator=(const kDTree &other) {
-    // Implement copy assignment operator
     if (this != &other) // Check for self-assignment
     {
         k = other.k;
@@ -24,14 +22,11 @@ const kDTree &kDTree::operator=(const kDTree &other) {
     return *this;
 }
 
-// Copy Constructor
 kDTree::kDTree(const kDTree &other) {
-    // Implement copy constructor
     k = other.k;
     root = cloneTree(other.root);
 }
 
-// Helper function to recursively clone a tree
 kDTreeNode* kDTree::cloneTree(const kDTreeNode *node)
 {
     if (node == nullptr)
@@ -39,7 +34,7 @@ kDTreeNode* kDTree::cloneTree(const kDTreeNode *node)
     return new kDTreeNode(node->data, cloneTree(node->left), cloneTree(node->right));
 }
 
-// Helper function to recursively delete a tree
+
 void kDTree::clearTree(kDTreeNode *node)
 {
     if (node != nullptr)
@@ -50,46 +45,88 @@ void kDTree::clearTree(kDTreeNode *node)
     }
 }
 
-void kDTree::inorderTraversalHelper(kDTreeNode *node) const {
+void kDTree::inorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     if (node == nullptr)
         return;
+
+    inorderTraversalHelper(node->left, isFirst);
     
-    inorderTraversalHelper(node->left);
-    // Process current node (e.g., print or do something with node->data)
-    // For example: cout << node->data << " ";
-    inorderTraversalHelper(node->right);
+    if (!isFirst) {
+        cout << " ";
+    } else {
+        isFirst = false;
+    }
+
+    cout << "(";
+    for (auto it = node->data.begin(); it != node->data.end(); ++it) {
+        cout << *it;
+        if (it != prev(node->data.end())) {
+            cout << ",";
+        }
+    }
+    cout << ")";
+    
+    inorderTraversalHelper(node->right, isFirst);
 }
 
 void kDTree::inorderTraversal() const {
-    inorderTraversalHelper(root);
+    bool isFirst = true;
+    inorderTraversalHelper(root, isFirst);
 }
 
-void kDTree::preorderTraversalHelper(kDTreeNode *node) const {
+void kDTree::preorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     if (node == nullptr)
         return;
     
-    // Process current node (e.g., print or do something with node->data)
-    // For example: cout << node->data << " ";
-    preorderTraversalHelper(node->left);
-    preorderTraversalHelper(node->right);
+    if (!isFirst) {
+        cout << " ";
+    } else {
+        isFirst = false;
+    }
+
+    cout << "(";
+    for (auto it = node->data.begin(); it != node->data.end(); ++it) {
+        cout << *it;
+        if (it != prev(node->data.end())) {
+            cout << ",";
+        }
+    }
+    cout << ")";
+
+    preorderTraversalHelper(node->left, isFirst);
+    preorderTraversalHelper(node->right, isFirst);
 }
 
 void kDTree::preorderTraversal() const {
-    preorderTraversalHelper(root);
+    bool isFirst = true;
+    preorderTraversalHelper(root, isFirst);
 }
 
-void kDTree::postorderTraversalHelper(kDTreeNode *node) const {
+void kDTree::postorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     if (node == nullptr)
         return;
     
-    postorderTraversalHelper(node->left);
-    postorderTraversalHelper(node->right);
-    // Process current node (e.g., print or do something with node->data)
-    // For example: cout << node->data << " ";
+    postorderTraversalHelper(node->left, isFirst);
+    postorderTraversalHelper(node->right, isFirst);
+    if (!isFirst) {
+        cout << " ";
+    } else {
+        isFirst = false;
+    }
+
+    cout << "(";
+    for (auto it = node->data.begin(); it != node->data.end(); ++it) {
+        cout << *it;
+        if (it != prev(node->data.end())) {
+            cout << ",";
+        }
+    }
+    cout << ")";
 }
 
 void kDTree::postorderTraversal() const {
-    postorderTraversalHelper(root);
+    bool isFirst = true;
+    postorderTraversalHelper(root, isFirst);
 }
 
 
@@ -111,9 +148,29 @@ int kDTree::leafCount() const {
     return 0;
 }
 
-// Insert a point into the tree
 void kDTree::insert(const vector<int> &point) {
-    // Implement insertion
+    root = insertHelper(root, point, 0);
+}
+
+kDTreeNode* kDTree::insertHelper(kDTreeNode* node, const vector<int> &point, int depth) {
+    // If the current node is null, create a new node with the point
+    if (node == nullptr) {
+        return new kDTreeNode(point);
+    }
+
+    // Calculate the current dimension
+    int dim = depth % k;
+
+    // Compare the point's coordinate with the current node's coordinate in the current dimension
+    if (point[dim] < node->data[dim]) {
+        // Recur for the left subtree
+        node->left = insertHelper(node->left, point, depth + 1);
+    } else {
+        // Recur for the right subtree
+        node->right = insertHelper(node->right, point, depth + 1);
+    }
+
+    return node;
 }
 
 // Remove a point from the tree

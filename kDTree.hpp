@@ -31,17 +31,18 @@ public:
     kDTreeNode *cloneTree(const kDTreeNode *node);
     void clearTree(kDTreeNode *node);
 
-    void inorderTraversalHelper(kDTreeNode *node) const;
+    void inorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
     void inorderTraversal() const;
-    void preorderTraversalHelper(kDTreeNode *node) const;
+    void preorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
     void preorderTraversal() const;
-    void postorderTraversalHelper(kDTreeNode *node) const;
+    void postorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
     void postorderTraversal() const;
     int height() const;
     int nodeCount() const;
     int leafCount() const;
 
     void insert(const vector<int> &point);
+    kDTreeNode* insertHelper(kDTreeNode* node, const vector<int> &point, int depth);
     void remove(const vector<int> &point);
     bool search(const vector<int> &point);
     void buildTree(const vector<vector<int>> &pointList);
