@@ -3,8 +3,10 @@
 class Dataset
 {
 private:
-    list<list<int>> data;
+    int nRows;
+    int nCols;
     vector<string> columnName;
+    list<list<int>> data;
 
 public:
     Dataset();

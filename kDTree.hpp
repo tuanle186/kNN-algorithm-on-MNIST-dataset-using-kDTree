@@ -28,9 +28,14 @@ public:
 
     const kDTree &operator=(const kDTree &other);
     kDTree(const kDTree &other);
+    kDTreeNode *cloneTree(const kDTreeNode *node);
+    void clearTree(kDTreeNode *node);
 
+    void inorderTraversalHelper(kDTreeNode *node) const;
     void inorderTraversal() const;
+    void preorderTraversalHelper(kDTreeNode *node) const;
     void preorderTraversal() const;
+    void postorderTraversalHelper(kDTreeNode *node) const;
     void postorderTraversal() const;
     int height() const;
     int nodeCount() const;
