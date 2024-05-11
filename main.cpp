@@ -27,26 +27,26 @@
 //     std::cout << "Label shape: " << nRows << "x" << nCols << endl;
 // }
 
-// void tc3()
-// {
-//     Dataset dataset;
-//     dataset.loadFromCSV("mnist.csv");
-//     int nRows, nCols;
+void tc3()
+{
+    Dataset dataset;
+    dataset.loadFromCSV("mnist.csv");
+    int nRows, nCols;
 
-//     Dataset X_train, X_test, y_train, y_test;
-//     Dataset feature = dataset.extract(0, -1, 1, -1);
-//     Dataset label = dataset.extract(0, -1, 0, 0);
+    Dataset X_train, X_test, y_train, y_test;
+    Dataset feature = dataset.extract(0, -1, 1, -1);
+    Dataset label = dataset.extract(0, -1, 0, 0);
 
-//     train_test_split(feature, label, 0.2, X_train, X_test, y_train, y_test);
-//     X_train.getShape(nRows, nCols);
-//     std::cout << "X_train shape: " << nRows << "x" << nCols << endl;
-//     X_test.getShape(nRows, nCols);
-//     std::cout << "X_test shape: " << nRows << "x" << nCols << endl;
-//     y_train.getShape(nRows, nCols);
-//     std::cout << "y_train shape: " << nRows << "x" << nCols << endl;
-//     y_test.getShape(nRows, nCols);
-//     std::cout << "y_test shape: " << nRows << "x" << nCols << endl;
-// }
+    train_test_split(feature, label, 0.2, X_train, X_test, y_train, y_test);
+    X_train.getShape(nRows, nCols);
+    std::cout << "X_train shape: " << nRows << "x" << nCols << endl;
+    X_test.getShape(nRows, nCols);
+    std::cout << "X_test shape: " << nRows << "x" << nCols << endl;
+    y_train.getShape(nRows, nCols);
+    std::cout << "y_train shape: " << nRows << "x" << nCols << endl;
+    y_test.getShape(nRows, nCols);
+    std::cout << "y_test shape: " << nRows << "x" << nCols << endl;
+}
 
 // void tc4()
 // {
@@ -112,11 +112,19 @@ void tc7() {
     Dataset extractedDataset = dataset.extract(2, 10, 4, 10);
 
     extractedDataset.printHead(10000, 10000);
+}
 
+void tc8() {
+    Dataset dataset1;
+    dataset1.loadFromCSV("mnist.csv");
+    dataset1.printHead();
+
+    Dataset dataset2 = dataset1;
+    dataset2.printHead();
 }
 
 int main(int argc, const char *argv[])
 {
-    tc7();
+    tc3();
     return 0;
 }

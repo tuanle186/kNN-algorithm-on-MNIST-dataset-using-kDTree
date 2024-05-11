@@ -219,3 +219,41 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
     extractedDataset.data = extractedData;
     return extractedDataset;
 }
+
+Dataset::Dataset(const Dataset &other) {
+    this->nRows = other.nRows;
+    this->nCols = other.nCols;
+    this->columnName = other.columnName;
+    this->data = other.data;
+}
+
+Dataset& Dataset::operator=(const Dataset& other) {
+    if (this != &other) { // Check for self-assignment
+        this->nRows = other.nRows;
+        this->nCols = other.nCols;
+        this->columnName = other.columnName;
+        this->data = other.data;
+    }
+    return *this; // Return a reference to the modified object
+}
+
+void train_test_split(  Dataset& X,           // Input: features
+                        Dataset& y,           // Input: labels
+                        double test_size,     // Input: test_size (0, 1)
+                        Dataset& X_train,     // Output
+                        Dataset& X_test,      // Output
+                        Dataset& y_train,     // Output
+                        Dataset& y_test)      // Output
+{
+    // Preprocessing
+    int nRows_original, nCols_original;
+    X.getShape(nRows_original, nCols_original);
+    int nRows_test = ceil(test_size*nRows_original);
+    int nRows_train = nRows_original - nRows_test;
+
+    // Extracting
+    X_train = X.extract(0, nRows_train - 1, 0, -1);
+    X_test = X.extract(nRows_train, -1, 0, -1);
+    y_train = y.extract(0, nRows_train - 1, 0, -1);
+    y_test = y.extract(nRows_train, -1, 0, -1);
+}
