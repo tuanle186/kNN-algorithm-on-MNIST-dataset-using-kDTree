@@ -69,3 +69,153 @@ void Dataset::printHead(int nRows, int nCols) const {
         }
     }
 }
+
+void Dataset::printTail(int nRows, int nCols) const {
+    if (nRows < 0 || nCols <= 0) {
+        return;
+    }
+    nRows = min(nRows, this->nRows);
+    nCols = min(nCols, this->nCols);
+
+    for (auto it = columnName.end() - nCols; it != columnName.end(); ++it) {
+        cout << *it;
+        if (it != columnName.end() - 1) {
+            cout << " ";
+        }
+    }
+
+    cout << endl;
+    // Calculate the starting row for printing
+    auto rowIt = data.begin();
+    int startRow = this->nRows - nRows;
+    advance(rowIt, startRow);
+
+    // Print the subset of elements
+    for (; rowIt != data.end(); ++rowIt) {
+        // Calculate the starting column for printing
+        auto colIt = rowIt->begin();
+        int startCol = this->nCols - nCols;
+        advance(colIt, startCol);
+
+        // Print the elements
+        for (int j = 0; colIt != rowIt->end(); ++colIt) {
+            cout << *colIt;
+            if (next(colIt) != rowIt->end()) {
+                cout << " ";
+            }
+        }
+
+        if (next(rowIt) != data.end()) {
+            cout << endl;
+        }
+    }
+}
+
+void Dataset::getShape(int &nRows, int &nCols) const {
+    nRows = this->nRows;
+    nCols = this->nCols;
+}
+
+void Dataset::columns() const {
+    for (auto it = columnName.begin(); it != columnName.end(); ++it) {
+        cout << *it;
+        if (it != columnName.end() - 1) {
+            cout << " ";
+        }
+    }
+}
+
+bool Dataset::drop(int axis, int index, std::string columns) {
+    if (axis != 0 && axis != 1) {
+        cout << "axis is not 0 or 1" << endl;
+        return false;
+    }
+
+    if (axis == 0) { // dropping a row
+        if (index >= nRows || index < 0) {
+            cout << "Index out of bound, fail to drop a col" << endl;
+            return false;
+        }
+        auto rowIt = data.begin();
+        advance(rowIt, index);
+        data.erase(rowIt);
+        nRows--;
+        return true;
+    } 
+    else { // dropping a column
+        // int colIndex = colName->getIndexOf(columns);
+        int colIndex = 0;
+        bool found = false;
+        for (auto it = columnName.begin(); it < columnName.end(); ++it) {
+            if (*it == columns) {
+                found = true;
+                break;
+            }
+            colIndex++;
+        }
+
+        if (!found) {
+            cout << "Column's name not found, failed to drop a col" << endl;
+            return false;
+        }
+
+        columnName.erase(columnName.begin() + colIndex);
+        for (auto& row : data) {
+            auto colIt = row.begin();
+            advance(colIt, colIndex);
+            row.erase(colIt);
+        }
+        nCols--;
+        return true;
+    }
+
+    cout << "Failed to drop a row or a col" << endl;
+    return false;
+}
+
+Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) const {
+    Dataset extractedDataset;
+    // Preprocessing
+    if (endRow == -1) { // takes all rows
+        endRow = this->nRows - 1;
+    }
+    if (endCol == -1) { // takes all cols
+        endCol = this->nCols - 1;
+    }
+
+    // Set the nRows and nCols attribute of extractedDataset
+    extractedDataset.nRows = endRow - startRow + 1;
+    extractedDataset.nCols = endCol - startCol + 1;
+
+    if (extractedDataset.nRows < 0 || extractedDataset.nCols < 0) {
+        throw std::out_of_range("get(): Out of range");
+    }
+
+    // Set the colName attribute of extractedDataset
+    auto startColNameIt = columnName.begin() + startCol;
+    auto endColNameIt = columnName.begin() + endCol + 1;
+    for (auto it = startColNameIt; it != endColNameIt; ++it) {
+        extractedDataset.columnName.push_back(*it);
+    }
+
+    // Set the data attribute of extractedDataset
+    auto startRowIt = data.begin();
+    auto endRowIt = data.begin();
+    advance(startRowIt, startRow);
+    advance(endRowIt, endRow + 1);
+
+    list<list<int>> extractedData;
+    for (auto rowIt = startRowIt; rowIt != endRowIt; ++rowIt) {
+        auto startColIt = rowIt->begin();
+        auto endColIt = rowIt->begin();
+        advance(startColIt, startCol);
+        advance(endColIt, endCol + 1);
+        list<int> newExtractedRow;
+        for (auto colIt = startColIt; colIt != endColIt; ++colIt) {
+            newExtractedRow.push_back(*colIt);
+        }
+        extractedData.push_back(newExtractedRow);
+    }
+    extractedDataset.data = extractedData;
+    return extractedDataset;
+}

@@ -94,11 +94,29 @@
 void tc6() {
     Dataset dataset;
     dataset.loadFromCSV("mnist.csv");
-    dataset.printHead(10000, 10);
+    dataset.printHead(5, 10);
+    int nRows, nCols;
+    dataset.getShape(nRows, nCols);
+    cout << "Shape: " << nRows << "x" << nCols << endl;
+    dataset.drop(1, 0, "1x1");
+    dataset.printHead(5, 10);
+    dataset.getShape(nRows, nCols);
+    cout << "Shape: " << nRows << "x" << nCols << endl;
+}
+
+void tc7() {
+    Dataset dataset;
+    dataset.loadFromCSV("mnist.csv");
+    dataset.printHead(15, 15);
+    cout << endl;
+    Dataset extractedDataset = dataset.extract(2, 10, 4, 10);
+
+    extractedDataset.printHead(10000, 10000);
+
 }
 
 int main(int argc, const char *argv[])
 {
-    tc6();
+    tc7();
     return 0;
 }
