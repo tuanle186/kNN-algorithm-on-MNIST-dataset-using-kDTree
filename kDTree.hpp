@@ -47,6 +47,8 @@ public:
     void insert(const vector<int> &point);
     kDTreeNode* insertHelper(kDTreeNode* node, const vector<int> &point, int depth);
     void remove(const vector<int> &point);
+    kDTreeNode* removeHelper(kDTreeNode* node, const vector<int> &point, int depth);
+    kDTreeNode* findReplacementNode(kDTreeNode* node, int depth, int alpha); 
     bool search(const vector<int> &point);
     void buildTree(const vector<vector<int>> &pointList);
     void nearestNeighbour(const vector<int> &target, kDTreeNode *best);

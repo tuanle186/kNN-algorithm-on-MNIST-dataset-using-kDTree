@@ -149,7 +149,6 @@ int kDTree::nodeCountHelper(kDTreeNode *node) const {
     return 1 + nodeCountHelper(node->left) + nodeCountHelper(node->right);
 }
 
-
 int kDTree::leafCount() const {
     return leafCountHelper(root);
 }
@@ -161,7 +160,6 @@ int kDTree::leafCountHelper(kDTreeNode *node) const {
         return 1;
     return leafCountHelper(node->left) + leafCountHelper(node->right);
 }
-
 
 void kDTree::insert(const vector<int> &point) {
     if (point.size() != k) {
@@ -190,9 +188,107 @@ kDTreeNode* kDTree::insertHelper(kDTreeNode* node, const vector<int> &point, int
     return node;
 }
 
-// Remove a point from the tree
 void kDTree::remove(const vector<int> &point) {
-    // Implement removal
+    if (point.size() != k) {
+        return;
+    }
+    root = removeHelper(root, point, 0);
+}
+
+kDTreeNode* kDTree::removeHelper(kDTreeNode* node, const vector<int> &point, int depth) {
+    // If the current node is null, return null
+    if (node == nullptr)
+        return nullptr;
+    
+    // Calculate the current dimension
+    int dim = depth % k;
+    
+    // Recursively search for the node containing the point
+    if (point == node->data) { // Node found
+        // Case 1: Node is a leaf
+        if (node->left == nullptr && node->right == nullptr) {
+            delete node;
+            return nullptr;
+        } 
+        // Case 2: Node has a right subtree
+        else if (node->right != nullptr) {
+            // Find replacement node r in u.right
+            kDTreeNode* replacementNode = findReplacementNode(node->right, depth + 1, dim);
+            
+            // Overwrite  u's point
+            node->data = replacementNode->data;
+
+            // Remove replacementNode
+            node->right = removeHelper(node->right, replacementNode->data, depth + 1);
+        } 
+        // Case 3: Node has a left subtree
+        else {
+            // Find replacement node r in u.left
+            kDTreeNode* replacementNode = findReplacementNode(node->left, depth + 1, dim);
+
+            // Overwrite u's point
+            node->data = replacementNode->data;
+
+            // Move left subtree of u to become right subtree of u
+            node->right = node->left;
+            node->left = nullptr;
+
+            // Remove replacement node
+            node->right = removeHelper(node->right, replacementNode->data, depth + 1);
+        }
+    } else {
+        // Recursively search in the appropriate subtree
+        if (point[dim] < node->data[dim]) {
+            node->left = removeHelper(node->left, point, depth + 1);
+        } else {
+            node->right = removeHelper(node->right, point, depth + 1);
+        }
+    }
+    
+    return node;
+}
+
+kDTreeNode* kDTree::findReplacementNode(kDTreeNode* node, int depth, int alpha) {
+    if (node == nullptr) {
+        return nullptr; // If the tree is empty, return nullptr
+    }
+
+    int dim = depth % k; // Determine the dimension to split on based on the depth
+
+    if (dim == alpha) {
+        // If the node is split by alpha dimension
+        if (node->left != nullptr) {
+            // Continue recursively to the bottom of the left subtree
+            return findReplacementNode(node->left, depth + 1, alpha);
+        } else {
+            // If the left subtree is NULL, return the current node
+            return node;
+        }
+    } else {
+        // If the node is split by a dimension other than alpha
+        kDTreeNode* minNode = node;
+
+        // Recursively traverse both subtrees
+        if (node->left != nullptr) {
+            kDTreeNode* leftMin = findReplacementNode(node->left, depth + 1, alpha);
+            if (leftMin != nullptr && leftMin->data[alpha] < minNode->data[alpha]) {
+                minNode = leftMin;
+            }
+        }
+        if (node->right != nullptr) {
+            kDTreeNode* rightMin = findReplacementNode(node->right, depth + 1, alpha);
+            if (rightMin != nullptr && rightMin->data[alpha] < minNode->data[alpha]) {
+                minNode = rightMin;
+            }
+        }
+
+        // Check if the current node has a smaller value along the alpha axis
+        if (node->data[alpha] < minNode->data[alpha]) {
+            minNode = node;
+        }
+
+        return minNode;
+    }
 }
 
 // Search for a point in the tree
