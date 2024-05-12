@@ -291,11 +291,39 @@ kDTreeNode* kDTree::findReplacementNode(kDTreeNode* node, int depth, int alpha) 
     }
 }
 
-// Search for a point in the tree
 bool kDTree::search(const vector<int> &point) {
-    // Implement search
-    return false;
+    if (point.size() != k) {
+        return false;
+    }
+    return searchRecursive(root, point, 0);
 }
+
+bool kDTree::searchRecursive(kDTreeNode* node, const vector<int> &point, int depth) {
+    // If the current node is null, the point doesn't exist in the tree
+    if (node == nullptr) {
+        return false;
+    }
+
+    // Calculate the dimension to split on based on the depth
+    int dim = depth % k;
+
+    // If the current node's point is equal to the search point, return true
+    if (node->data == point) {
+        return true;
+    }
+
+    // Compare the current dimension of the node to the search point's dimension
+    if (point[dim] < node->data[dim]) {
+        // If the search point is less than the current node's point in the current dimension,
+        // search in the left subtree
+        return searchRecursive(node->left, point, depth + 1);
+    } else {
+        // If the search point is greater than or equal to the current node's point in the current dimension,
+        // search in the right subtree
+        return searchRecursive(node->right, point, depth + 1);
+    }
+}
+
 
 // Build the tree from a list of points
 void kDTree::buildTree(const vector<vector<int>> &pointList) {

@@ -50,6 +50,7 @@ public:
     kDTreeNode* removeHelper(kDTreeNode* node, const vector<int> &point, int depth);
     kDTreeNode* findReplacementNode(kDTreeNode* node, int depth, int alpha); 
     bool search(const vector<int> &point);
+    bool searchRecursive(kDTreeNode* node, const vector<int> &point, int depth);
     void buildTree(const vector<vector<int>> &pointList);
     void nearestNeighbour(const vector<int> &target, kDTreeNode *best);
     void kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList);
