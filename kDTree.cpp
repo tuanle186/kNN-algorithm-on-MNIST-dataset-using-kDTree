@@ -60,7 +60,7 @@ void kDTree::inorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     for (auto it = node->data.begin(); it != node->data.end(); ++it) {
         cout << *it;
         if (it != prev(node->data.end())) {
-            cout << ",";
+            cout << ", ";
         }
     }
     cout << ")";
@@ -87,7 +87,7 @@ void kDTree::preorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     for (auto it = node->data.begin(); it != node->data.end(); ++it) {
         cout << *it;
         if (it != prev(node->data.end())) {
-            cout << ",";
+            cout << ", ";
         }
     }
     cout << ")";
@@ -118,7 +118,7 @@ void kDTree::postorderTraversalHelper(kDTreeNode *node, bool& isFirst) const {
     for (auto it = node->data.begin(); it != node->data.end(); ++it) {
         cout << *it;
         if (it != prev(node->data.end())) {
-            cout << ",";
+            cout << ", ";
         }
     }
     cout << ")";
@@ -380,19 +380,6 @@ kDTreeNode* kDTree::buildTreeHelper(const vector<vector<int>>& points, int depth
 
     // Sort points along current dimension using merge sort
     mergeSort(const_cast<vector<vector<int>>&>(points), 0, points.size() - 1, dim);
-
-    for (const auto& point : points) {
-        // Print each point
-        std::cout << "(";
-        for (size_t i = 0; i < point.size(); ++i) {
-            std::cout << point[i];
-            if (i < point.size() - 1) {
-                std::cout << ", ";
-            }
-        }
-        std::cout << ")";
-    }
-    cout << endl;
     
     // Find median index
     int medianIndex = points.size() / 2;
@@ -459,10 +446,67 @@ void kDTree::nearestNeighbour(const std::vector<int>& target, kDTreeNode*& best)
     nearestNeighbourHelper(target, root, 0, best);
 }
 
-// Find the k nearest neighbors to a target point
-void kDTree::kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList) {
-    // Implement k nearest neighbors search
+
+void kDTree::kNearestNeighbour(const vector<int>& target, int k, vector<kDTreeNode*>& bestList) {
+    // Vector to store nearest neighbors sorted by distance
+    vector<pair<double, kDTreeNode*>> nearestNeighbors;
+
+    // Recursive helper function to perform k nearest neighbors search
+    kNearestNeighbourHelper(target, k, root, 0, nearestNeighbors);
+
+    // Extract k nearest neighbors from vector
+    for (const auto& pair : nearestNeighbors) {
+        bestList.push_back(pair.second);
+    }
+
+    // Reverse the list to maintain the original order (nearest to farthest)
+    // std::reverse(bestList.begin(), bestList.end());
 }
+
+void kDTree::kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNode* node, int depth, vector<pair<double, kDTreeNode*>>& nearestNeighbors) {
+    if (node == nullptr) {
+        return;
+    }
+
+    // Determine dimension to compare
+    int dim = depth % k;
+
+    // Choose next node based on splitting plane
+    kDTreeNode* nextNode = nullptr;
+    if (target[dim] < node->data[dim]) {
+        nextNode = node->left;
+    } else {
+        nextNode = node->right;
+    }
+
+    // Recursively search down the tree
+    kNearestNeighbourHelper(target, k, nextNode, depth + 1, nearestNeighbors);
+
+    // Check if the current node is a leaf node
+    if (node->left == nullptr && node->right == nullptr) {
+        // Calculate distance from target to current node
+        double currentDist = distance(target, node->data);
+
+        // Insert current node into vector
+        nearestNeighbors.push_back({currentDist, node});
+
+        // Sort vector based on distance
+        // mergeSort(nearestNeighbors, 0, nearestNeighbors.size() - 1, 0);
+
+        // Resize vector to maintain k nearest neighbors
+        if (nearestNeighbors.size() > k) {
+            nearestNeighbors.resize(k);
+        }
+    }
+
+    // Check if there could be closer points on the other side of the splitting plane
+    double splitDist = std::abs(target[dim] - node->data[dim]);
+    if (splitDist <= nearestNeighbors.front().first || nearestNeighbors.size() < k) {
+        // Explore the other side of the tree from the current node
+        kNearestNeighbourHelper(target, k, (nextNode == node->left) ? node->right : node->left, depth + 1, nearestNeighbors);
+    }
+}
+
 
 
 kNN::kNN(int k) {

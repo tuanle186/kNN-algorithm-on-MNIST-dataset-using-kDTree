@@ -14,6 +14,21 @@ struct kDTreeNode
         this->left = left;
         this->right = right;
     }
+
+    friend ostream &operator<<(ostream &os, const kDTreeNode &node)
+    {
+        os << "(";
+        for (int i = 0; i < node.data.size(); i++)
+        {
+            os << node.data[i];
+            if (i != node.data.size() - 1)
+            {
+                os << ", ";
+            }
+        }
+        os << ")";
+        return os;
+    }
 };
 
 class kDTree
@@ -61,6 +76,7 @@ private:
     void merge(vector<vector<int>>& arr, int l, int m, int r, int dim);
     void nearestNeighbourHelper(const vector<int>& target, kDTreeNode* node, int depth, kDTreeNode*& best);
     double distance(const vector<int>& a, const vector<int>& b);
+    void kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNode* node, int depth, vector<pair<double, kDTreeNode*>>& nearestNeighbors);
 };
 
 class kNN
