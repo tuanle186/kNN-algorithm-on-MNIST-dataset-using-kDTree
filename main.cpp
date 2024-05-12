@@ -146,7 +146,7 @@ void tc9() {
     myTree.insert(point8);
     myTree.insert(point9);
 
-    myTree.remove(point1);
+    // myTree.remove(point1);
 
     cout << "preOrder: ";
     myTree.preorderTraversal();
@@ -161,10 +161,65 @@ void tc9() {
     cout << "Height: " << myTree.height() << endl;
     cout << "Node count: " << myTree.nodeCount() << endl;
     cout << "Left count: " << myTree.leafCount() << endl;
+
+    cout << "Search (9, 2): " << myTree.search(point9) << endl;
+}
+
+void tc10() {
+    vector<int> p1({5, 6});
+    vector<int> p2({2, 2});
+    vector<int> p3({7, 3});
+    vector<int> p4({2, 8});
+    vector<int> p5({8, 7});
+    vector<int> p6({8, 1});
+    vector<int> p7({9, 4});
+    vector<int> p8({3, 5});
+    vector<vector<int>> points({p1, p2, p3, p4, p5, p6, p7, p8});
+    kDTree myTree;
+    myTree.buildTree(points);
+    cout << "preOrder: ";
+    myTree.preorderTraversal();
+    cout << "end" << endl;
+    cout << "inOrder: ";
+    myTree.inorderTraversal();
+    cout << "end" << endl;
+    cout << "postOrder:";
+    myTree.postorderTraversal();
+    cout << "end" << endl;
+    cout << "Height: " << myTree.height() << endl;
+    cout << "Node count: " << myTree.nodeCount() << endl;
+    cout << "Leaf count: " << myTree.leafCount() << endl;
+}
+
+void tc11() {
+    vector<int> p1({1, 1});
+    vector<int> p2({2, 2});
+    vector<int> p3({3, 3});
+    vector<int> p4({3, 3});
+    vector<int> p5({4, 4});
+    vector<int> p6({5, 5});
+    vector<int> p7({6, 6});
+    vector<int> p8({7, 7});
+
+    vector<vector<int>> points({p1, p2, p3, p4, p5, p6, p7, p8});
+    kDTree myTree;
+    myTree.buildTree(points);
+    cout << "preOrder: ";
+    myTree.preorderTraversal();
+    cout << "end" << endl;
+    cout << "inOrder: ";
+    myTree.inorderTraversal();
+    cout << "end" << endl;
+    cout << "postOrder:";
+    myTree.postorderTraversal();
+    cout << "end" << endl;
+    cout << "Height: " << myTree.height() << endl;
+    cout << "Node count: " << myTree.nodeCount() << endl;
+    cout << "Leaf count: " << myTree.leafCount() << endl;
 }
 
 int main(int argc, const char *argv[])
 {
-    tc9();
+    tc11();
     return 0;
 }

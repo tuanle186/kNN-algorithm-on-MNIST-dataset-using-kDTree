@@ -32,28 +32,33 @@ public:
     void clearTree(kDTreeNode *node);
 
     void inorderTraversal() const;
-    void inorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
     void preorderTraversal() const;
-    void preorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
     void postorderTraversal() const;
-    void postorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
     int height() const;
-    int heightHelper(kDTreeNode *node) const;
     int nodeCount() const;
-    int nodeCountHelper(kDTreeNode *node) const;
     int leafCount() const;
-    int leafCountHelper(kDTreeNode *node) const;
 
     void insert(const vector<int> &point);
-    kDTreeNode* insertHelper(kDTreeNode* node, const vector<int> &point, int depth);
-    void remove(const vector<int> &point);
-    kDTreeNode* removeHelper(kDTreeNode* node, const vector<int> &point, int depth);
-    kDTreeNode* findReplacementNode(kDTreeNode* node, int depth, int alpha); 
+    void remove(const vector<int> &point); 
     bool search(const vector<int> &point);
-    bool searchRecursive(kDTreeNode* node, const vector<int> &point, int depth);
     void buildTree(const vector<vector<int>> &pointList);
     void nearestNeighbour(const vector<int> &target, kDTreeNode *best);
     void kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList);
+
+private:
+    void inorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
+    void preorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
+    void postorderTraversalHelper(kDTreeNode *node, bool& isFirst) const;
+    int heightHelper(kDTreeNode *node) const;
+    int nodeCountHelper(kDTreeNode *node) const;
+    int leafCountHelper(kDTreeNode *node) const;
+    kDTreeNode* insertHelper(kDTreeNode* node, const vector<int> &point, int depth);
+    kDTreeNode* removeHelper(kDTreeNode* node, const vector<int> &point, int depth);
+    kDTreeNode* findReplacementNode(kDTreeNode* node, int depth, int alpha);
+    bool searchHelper(kDTreeNode* node, const vector<int> &point, int depth);
+    kDTreeNode* buildTreeHelper(const vector<vector<int>> &points, int depth);
+    void mergeSort(vector<vector<int>>& arr, int l, int r, int dim);
+    void merge(vector<vector<int>>& arr, int l, int m, int r, int dim);
 };
 
 class kNN

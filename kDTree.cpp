@@ -295,10 +295,10 @@ bool kDTree::search(const vector<int> &point) {
     if (point.size() != k) {
         return false;
     }
-    return searchRecursive(root, point, 0);
+    return searchHelper(root, point, 0);
 }
 
-bool kDTree::searchRecursive(kDTreeNode* node, const vector<int> &point, int depth) {
+bool kDTree::searchHelper(kDTreeNode* node, const vector<int> &point, int depth) {
     // If the current node is null, the point doesn't exist in the tree
     if (node == nullptr) {
         return false;
@@ -316,18 +316,99 @@ bool kDTree::searchRecursive(kDTreeNode* node, const vector<int> &point, int dep
     if (point[dim] < node->data[dim]) {
         // If the search point is less than the current node's point in the current dimension,
         // search in the left subtree
-        return searchRecursive(node->left, point, depth + 1);
+        return searchHelper(node->left, point, depth + 1);
     } else {
         // If the search point is greater than or equal to the current node's point in the current dimension,
         // search in the right subtree
-        return searchRecursive(node->right, point, depth + 1);
+        return searchHelper(node->right, point, depth + 1);
+    }
+}
+ 
+void kDTree::merge(vector<vector<int>>& arr, int l, int m, int r, int dim) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    vector<vector<int>> L(arr.begin() + l, arr.begin() + l + n1);
+    vector<vector<int>> R(arr.begin() + m + 1, arr.begin() + m + 1 + n2);
+
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i][dim] <= R[j][dim]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
     }
 }
 
+void kDTree::mergeSort(vector<vector<int>>& arr, int l, int r, int dim) {
+    if (l >= r) {
+        return;
+    }
+    int m = l + (r - l) / 2;
+    mergeSort(arr, l, m, dim);
+    mergeSort(arr, m + 1, r, dim);
+    merge(arr, l, m, r, dim);
+}
 
-// Build the tree from a list of points
-void kDTree::buildTree(const vector<vector<int>> &pointList) {
-    // Implement tree construction
+void kDTree::buildTree(const vector<vector<int>>& pointList) {
+    root = buildTreeHelper(pointList, 0);
+}
+
+kDTreeNode* kDTree::buildTreeHelper(const vector<vector<int>>& points, int depth) {
+    if (points.empty()) {
+        return nullptr;
+    }
+
+    // Determine current dimension to split on
+    int dim = depth % k;
+
+    // Sort points along current dimension using merge sort
+    mergeSort(const_cast<vector<vector<int>>&>(points), 0, points.size() - 1, dim);
+
+    for (const auto& point : points) {
+        // Print each point
+        std::cout << "(";
+        for (size_t i = 0; i < point.size(); ++i) {
+            std::cout << point[i];
+            if (i < point.size() - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << ")";
+    }
+    cout << endl;
+    
+    // Find median index
+    int medianIndex = points.size() / 2;
+
+    if (points.size() % 2 == 0 && medianIndex > 0) {
+        medianIndex--;
+    }
+
+    // Create node with median point
+    kDTreeNode* node = new kDTreeNode(points[medianIndex]);
+
+    // Recursively build left and right subtrees
+    node->left = buildTreeHelper(vector<vector<int>>(points.begin(), points.begin() + medianIndex), depth + 1);
+    node->right = buildTreeHelper(vector<vector<int>>(points.begin() + medianIndex + 1, points.end()), depth + 1);
+
+    return node;
 }
 
 // Find the nearest neighbor to a target point
@@ -338,6 +419,8 @@ void kDTree::nearestNeighbour(const vector<int> &target, kDTreeNode *best) {
 // Find the k nearest neighbors to a target point
 void kDTree::kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList) {
     // Implement k nearest neighbors search
+    vector<kDTreeNode*> v;
+    bestList = v;
 }
 
 
