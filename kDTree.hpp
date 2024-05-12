@@ -42,7 +42,7 @@ public:
     void remove(const vector<int> &point); 
     bool search(const vector<int> &point);
     void buildTree(const vector<vector<int>> &pointList);
-    void nearestNeighbour(const vector<int> &target, kDTreeNode *best);
+    void nearestNeighbour(const vector<int> &target, kDTreeNode* &best);
     void kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList);
 
 private:
@@ -59,6 +59,8 @@ private:
     kDTreeNode* buildTreeHelper(const vector<vector<int>> &points, int depth);
     void mergeSort(vector<vector<int>>& arr, int l, int r, int dim);
     void merge(vector<vector<int>>& arr, int l, int m, int r, int dim);
+    void nearestNeighbourHelper(const vector<int>& target, kDTreeNode* node, int depth, kDTreeNode*& best);
+    double distance(const vector<int>& a, const vector<int>& b);
 };
 
 class kNN

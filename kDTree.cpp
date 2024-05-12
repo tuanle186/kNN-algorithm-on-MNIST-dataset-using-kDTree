@@ -411,16 +411,57 @@ kDTreeNode* kDTree::buildTreeHelper(const vector<vector<int>>& points, int depth
     return node;
 }
 
-// Find the nearest neighbor to a target point
-void kDTree::nearestNeighbour(const vector<int> &target, kDTreeNode *best) {
-    // Implement nearest neighbor search
+double kDTree::distance(const vector<int>& a, const vector<int>& b) {
+    double dist = 0;
+    for (int i = 0; i < k; ++i) {
+        dist += pow(a[i] - b[i], 2);
+    }
+    return sqrt(dist);
+}
+
+void kDTree::nearestNeighbourHelper(const std::vector<int>& target, kDTreeNode* node, int depth, kDTreeNode*& best) {
+    if (node == nullptr) {
+        return;
+    }
+
+    // Determine dimension to compare
+    int dim = depth % k;
+
+    // Choose next node based on splitting plane
+    kDTreeNode* nextNode = nullptr;
+    if (target[dim] < node->data[dim]) {
+        nextNode = node->left;
+    } else {
+        nextNode = node->right;
+    }
+
+    // Recursively search down the tree
+    nearestNeighbourHelper(target, nextNode, depth + 1, best);
+
+    // Calculate distance from target to current node
+    double currentDist = distance(target, node->data);
+
+    // Update best node if current node is closer or if it's the first node encountered
+    if (best == nullptr || currentDist < distance(target, best->data)) {
+        best = node;
+    }
+
+    // Check if there could be closer points on the other side of the splitting plane
+    double splitDist = abs(target[dim] - node->data[dim]);
+    if (splitDist <= distance(target, best->data)) {
+        // Explore the other side of the tree from the current node
+        nearestNeighbourHelper(target, (nextNode == node->left) ? node->right : node->left, depth + 1, best);
+    }
+}
+
+void kDTree::nearestNeighbour(const std::vector<int>& target, kDTreeNode*& best) {
+    best = nullptr;
+    nearestNeighbourHelper(target, root, 0, best);
 }
 
 // Find the k nearest neighbors to a target point
 void kDTree::kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList) {
     // Implement k nearest neighbors search
-    vector<kDTreeNode*> v;
-    bestList = v;
 }
 
 

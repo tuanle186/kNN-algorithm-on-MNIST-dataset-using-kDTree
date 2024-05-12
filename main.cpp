@@ -130,9 +130,9 @@ void tc9() {
     vector<int> point2({2, 2});
     vector<int> point3({7, 3});
     vector<int> point4({2, 8});
-    // vector<int> point5({8, 7});
-    vector<int> point6({8, 1});
-    // vector<int> point7({9, 4});
+    vector<int> point5({8, 7});
+    vector<int> point6({8, 2});
+    vector<int> point7({9, 5});
     vector<int> point8({3, 5});
     vector<int> point9({9, 2});
 
@@ -140,9 +140,9 @@ void tc9() {
     myTree.insert(point2);
     myTree.insert(point3);
     myTree.insert(point4);
-    // myTree.insert(point5);
+    myTree.insert(point5);
     myTree.insert(point6);
-    // myTree.insert(point7);
+    myTree.insert(point7);
     myTree.insert(point8);
     myTree.insert(point9);
 
@@ -163,6 +163,10 @@ void tc9() {
     cout << "Left count: " << myTree.leafCount() << endl;
 
     cout << "Search (9, 2): " << myTree.search(point9) << endl;
+    vector<int> target({9, 3});
+    kDTreeNode* best;
+    myTree.nearestNeighbour(target, best);
+    cout << "Nearest Neighbour: (" << best->data[0] << ", " << best->data[1] << ")" << endl;
 }
 
 void tc10() {
@@ -220,6 +224,6 @@ void tc11() {
 
 int main(int argc, const char *argv[])
 {
-    tc11();
+    tc9();
     return 0;
 }
