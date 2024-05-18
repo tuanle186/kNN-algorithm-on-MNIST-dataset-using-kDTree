@@ -549,7 +549,7 @@ void kDTree::kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNod
     }
 
     // Determine dimension to compare
-    int dim = depth % target.size();  // Corrected to use target.size()
+    int dim = depth % this->k;
 
     // Choose next node based on splitting plane
     kDTreeNode* nextNode = nullptr;
@@ -585,7 +585,6 @@ void kDTree::kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNod
     }
 }
 
-// Merge two subarrays of nearestNeighbors
 void kDTree::merge_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
@@ -631,7 +630,6 @@ void kDTree::merge_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int
     }
 }
 
-// MergeSort function to sort nearestNeighbors based on distance
 void kDTree::mergeSort_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2;
@@ -648,7 +646,7 @@ void kDTree::mergeSort_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr,
 
 
 kNN::kNN(int k) {
-
+    
 }
 
 void kNN::fit(Dataset &X_train, Dataset &y_train) {
