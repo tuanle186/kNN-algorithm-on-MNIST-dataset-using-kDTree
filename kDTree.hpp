@@ -72,11 +72,13 @@ private:
     kDTreeNode* findReplacementNode(kDTreeNode* node, int depth, int alpha);
     bool searchHelper(kDTreeNode* node, const vector<int> &point, int depth);
     kDTreeNode* buildTreeHelper(const vector<vector<int>> &points, int depth);
-    void mergeSort(vector<vector<int>>& arr, int l, int r, int dim);
-    void merge(vector<vector<int>>& arr, int l, int m, int r, int dim);
+    void mergeSort_buildTree(vector<vector<int>>& arr, int l, int r, int dim);
+    void merge_buildTree(vector<vector<int>>& arr, int l, int m, int r, int dim);
     void nearestNeighbourHelper(const vector<int>& target, kDTreeNode* node, int depth, kDTreeNode*& best);
     double distance(const vector<int>& a, const vector<int>& b);
     void kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNode* node, int depth, vector<pair<double, kDTreeNode*>>& nearestNeighbors);
+    void mergeSort_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int right);
+    void merge_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int mid, int right);
 };
 
 class kNN
