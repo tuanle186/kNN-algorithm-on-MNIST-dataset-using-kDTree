@@ -773,5 +773,27 @@ int findMostCommonLabel(const std::vector<kDTreeNode*>& bestList) {
 /* -------------------------------------------------------------------------- */
 
 double kNN::score(const Dataset &y_test, const Dataset &y_pred) {
-    return 0.0;
+    list<list<int>> y_test_data = y_test.data;
+    list<list<int>> y_pred_data = y_pred.data;
+
+    int n_correct_prediction = 0; // counting correct prediction
+    int a, b;
+
+    auto it_test = y_test_data.begin();
+    auto it_pred = y_pred_data.begin();
+
+    while (it_test != y_test_data.end() && it_pred != y_pred_data.end()) {
+        a = it_test->front();
+        b = it_pred->front();
+        if (a == b) {
+            n_correct_prediction++;
+        }
+        it_test++;
+        it_pred++;
+    }
+
+    int n_prediction, _;
+    y_test.getShape(n_prediction, _);
+    double accuracy = n_correct_prediction/double(n_prediction);
+    return accuracy;
 }
