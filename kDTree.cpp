@@ -52,7 +52,7 @@ kDTreeNode* kDTree::cloneTree(const kDTreeNode *node)
 {
     if (node == nullptr)
         return nullptr;
-    return new kDTreeNode(node->data, cloneTree(node->left), cloneTree(node->right));
+    return new kDTreeNode(node->data, node->label, cloneTree(node->left), cloneTree(node->right));
 }
 
 
@@ -398,20 +398,32 @@ bool kDTree::searchHelper(kDTreeNode* node, const vector<int> &point, int depth)
 /*                               Build Tree                                   */
 /* -------------------------------------------------------------------------- */
 
-void kDTree::merge_buildTree(vector<vector<int>>& arr, int l, int m, int r, int dim) {
+void kDTree::merge(vector<vector<int>>& arr, vector<int>& labels, int l, int m, int r, int dim, bool useLabels) {
     int n1 = m - l + 1;
     int n2 = r - m;
 
     vector<vector<int>> L(arr.begin() + l, arr.begin() + l + n1);
     vector<vector<int>> R(arr.begin() + m + 1, arr.begin() + m + 1 + n2);
 
+    vector<int> L_labels, R_labels;
+    if (useLabels) {
+        L_labels = vector<int>(labels.begin() + l, labels.begin() + l + n1);
+        R_labels = vector<int>(labels.begin() + m + 1, labels.begin() + m + 1 + n2);
+    }
+
     int i = 0, j = 0, k = l;
     while (i < n1 && j < n2) {
         if (L[i][dim] <= R[j][dim]) {
             arr[k] = L[i];
+            if (useLabels) {
+                labels[k] = L_labels[i];
+            }
             i++;
         } else {
             arr[k] = R[j];
+            if (useLabels) {
+                labels[k] = R_labels[j];
+            }
             j++;
         }
         k++;
@@ -419,59 +431,79 @@ void kDTree::merge_buildTree(vector<vector<int>>& arr, int l, int m, int r, int 
 
     while (i < n1) {
         arr[k] = L[i];
+        if (useLabels) {
+            labels[k] = L_labels[i];
+        }
         i++;
         k++;
     }
 
     while (j < n2) {
         arr[k] = R[j];
+        if (useLabels) {
+            labels[k] = R_labels[j];
+        }
         j++;
         k++;
     }
 }
 
-void kDTree::mergeSort_buildTree(vector<vector<int>>& arr, int l, int r, int dim) {
+void kDTree::mergeSort(vector<vector<int>>& arr, vector<int>& labels, int l, int r, int dim, bool useLabels) {
     if (l >= r) {
         return;
     }
     int m = l + (r - l) / 2;
-    mergeSort_buildTree(arr, l, m, dim);
-    mergeSort_buildTree(arr, m + 1, r, dim);
-    merge_buildTree(arr, l, m, r, dim);
+    mergeSort(arr, labels, l, m, dim, useLabels);
+    mergeSort(arr, labels, m + 1, r, dim, useLabels);
+    merge(arr, labels, l, m, r, dim, useLabels);
 }
 
 void kDTree::buildTree(const vector<vector<int>>& pointList) {
-    root = buildTreeHelper(pointList, 0);
+    root = buildTreeHelper(pointList, vector<int>(), 0, false);
 }
 
-kDTreeNode* kDTree::buildTreeHelper(const vector<vector<int>>& points, int depth) {
+void kDTree::buildTree(const vector<vector<int>>& pointList, const vector<int>& labelList) {
+    root = buildTreeHelper(pointList, labelList, 0, true);
+}
+
+kDTreeNode* kDTree::buildTreeHelper(const vector<vector<int>>& points, const vector<int>& labels, int depth, bool useLabels) {
     if (points.empty()) {
         return nullptr;
     }
 
     // Determine current dimension to split on
-    int dim = depth % k;
+    int dim = depth % this->k;
+
+    // Copy points and labels to avoid modifying the original vectors
+    vector<vector<int>> pointsCopy = points;
+    vector<int> labelsCopy = labels;
 
     // Sort points along current dimension using merge sort
-    mergeSort_buildTree(const_cast<vector<vector<int>>&>(points), 0, points.size() - 1, dim);
+    mergeSort(pointsCopy, labelsCopy, 0, pointsCopy.size() - 1, dim, useLabels);
     
     // Find median index
-    int medianIndex = points.size() / 2;
+    int medianIndex = pointsCopy.size() / 2;
 
-    if (points.size() % 2 == 0 && medianIndex > 0) {
+    if (pointsCopy.size() % 2 == 0 && medianIndex > 0) {
         medianIndex--;
     }
 
-    // Create node with median point
-    kDTreeNode* node = new kDTreeNode(points[medianIndex]);
+    // Create node with the median point and label (if provided)
+    int* medianLabel = useLabels ? new int(labelsCopy[medianIndex]) : nullptr;
+    kDTreeNode* node = new kDTreeNode(pointsCopy[medianIndex], medianLabel);
 
     // Recursively build left and right subtrees
-    node->left = buildTreeHelper(vector<vector<int>>(points.begin(), points.begin() + medianIndex), depth + 1);
-    node->right = buildTreeHelper(vector<vector<int>>(points.begin() + medianIndex + 1, points.end()), depth + 1);
+    vector<vector<int>> leftPoints(pointsCopy.begin(), pointsCopy.begin() + medianIndex);
+    vector<vector<int>> rightPoints(pointsCopy.begin() + medianIndex + 1, pointsCopy.end());
+    
+    vector<int> leftLabels = useLabels ? vector<int>(labelsCopy.begin(), labelsCopy.begin() + medianIndex) : vector<int>();
+    vector<int> rightLabels = useLabels ? vector<int>(labelsCopy.begin() + medianIndex + 1, labelsCopy.end()) : vector<int>();
+
+    node->left = buildTreeHelper(leftPoints, leftLabels, depth + 1, useLabels);
+    node->right = buildTreeHelper(rightPoints, rightLabels, depth + 1, useLabels);
 
     return node;
 }
-
 
 /* -------------------------------------------------------------------------- */
 /*                            Nearest Neighbour                               */
@@ -569,7 +601,7 @@ void kDTree::kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNod
     nearestNeighbors.push_back({currentDist, node});
 
     // Sort vector based on distance
-    mergeSort_kNearestNeighbour(nearestNeighbors, 0, nearestNeighbors.size() - 1);
+    mergeSort(nearestNeighbors, 0, nearestNeighbors.size() - 1);
 
     // Resize vector to maintain k nearest neighbors
     if (nearestNeighbors.size() > k) {
@@ -585,7 +617,7 @@ void kDTree::kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNod
     }
 }
 
-void kDTree::merge_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int mid, int right) {
+void kDTree::merge(vector<pair<double, kDTreeNode*>>& arr, int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
 
@@ -630,33 +662,82 @@ void kDTree::merge_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int
     }
 }
 
-void kDTree::mergeSort_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int right) {
+void kDTree::mergeSort(vector<pair<double, kDTreeNode*>>& arr, int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2;
 
         // Sort first and second halves
-        mergeSort_kNearestNeighbour(arr, left, mid);
-        mergeSort_kNearestNeighbour(arr, mid + 1, right);
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
 
         // Merge the sorted halves
-        merge_kNearestNeighbour(arr, left, mid, right);
+        merge(arr, left, mid, right);
     }
 }
 
 
 
+
+/* -------------------------------------------------------------------------- */
+/*                             kNN Constructor                                */
+/* -------------------------------------------------------------------------- */
+
 kNN::kNN(int k) {
-    
+    this->k = k;
+    this->X_train = nullptr;
+    this->y_train = nullptr;
+    this->numClasses = -1;
+    this->tree = nullptr;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/*                                  Fit                                       */
+/* -------------------------------------------------------------------------- */
 
 void kNN::fit(Dataset &X_train, Dataset &y_train) {
-
+    vector<vector<int>> features = convertToListVector(X_train.data);
+    vector<int> labels = flattenList(y_train.data);
+    int numDims = X_train.data.front().size();
+    kDTree tree(numDims);
+    tree.buildTree(features, labels);
+    this->tree = &tree;
 }
+
+vector<vector<int>> convertToListVector(const list<list<int>>& listOfLists) {
+    vector<vector<int>> vectorOfVectors;
+
+    for (const auto& innerList : listOfLists) {
+        vector<int> innerVector(innerList.begin(), innerList.end());
+        vectorOfVectors.push_back(innerVector);
+    }
+
+    return vectorOfVectors;
+}
+
+vector<int> flattenList(const list<list<int>>& nested_list) {
+    std::vector<int> flattened_list;
+    for (const auto& inner_list : nested_list) {
+        for (int value : inner_list) {
+            flattened_list.push_back(value);
+        }
+    }
+    return flattened_list;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                Predict                                     */
+/* -------------------------------------------------------------------------- */
 
 Dataset kNN::predict(Dataset &X_test) {
     Dataset myDataset;
     return myDataset;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/*                                 Score                                      */
+/* -------------------------------------------------------------------------- */
 
 double kNN::score(const Dataset &y_test, const Dataset &y_pred) {
     return 0.0;

@@ -6,13 +6,20 @@
 struct kDTreeNode
 {
     vector<int> data;
+    int* label;
     kDTreeNode *left;
     kDTreeNode *right;
-    kDTreeNode(vector<int> data, kDTreeNode *left = nullptr, kDTreeNode *right = nullptr)
+    kDTreeNode(vector<int> data, int* label = nullptr, kDTreeNode *left = nullptr, kDTreeNode *right = nullptr)
     {
         this->data = data;
         this->left = left;
         this->right = right;
+        this->label = label;
+    }
+    ~kDTreeNode() {
+        if (label) {
+            delete label;
+        }
     }
 
     friend ostream &operator<<(ostream &os, const kDTreeNode &node)
@@ -57,6 +64,7 @@ public:
     void remove(const vector<int> &point); 
     bool search(const vector<int> &point);
     void buildTree(const vector<vector<int>> &pointList);
+    void buildTree(const vector<vector<int>>& pointList, const vector<int>& labelList);
     void nearestNeighbour(const vector<int> &target, kDTreeNode* &best);
     void kNearestNeighbour(const vector<int> &target, int k, vector<kDTreeNode *> &bestList);
 
@@ -71,14 +79,14 @@ private:
     kDTreeNode* removeHelper(kDTreeNode* node, const vector<int> &point, int depth);
     kDTreeNode* findReplacementNode(kDTreeNode* node, int depth, int alpha);
     bool searchHelper(kDTreeNode* node, const vector<int> &point, int depth);
-    kDTreeNode* buildTreeHelper(const vector<vector<int>> &points, int depth);
-    void mergeSort_buildTree(vector<vector<int>>& arr, int l, int r, int dim);
-    void merge_buildTree(vector<vector<int>>& arr, int l, int m, int r, int dim);
+    kDTreeNode* buildTreeHelper(const vector<vector<int>>& points, const vector<int>& labels, int depth, bool useLabels);
+    void mergeSort(vector<vector<int>>& arr, vector<int>& labels, int l, int r, int dim, bool useLabels);
+    void merge(vector<vector<int>>& arr, vector<int>& labels, int l, int m, int r, int dim, bool useLabels);
     void nearestNeighbourHelper(const vector<int>& target, kDTreeNode* node, int depth, kDTreeNode*& best);
     double distance(const vector<int>& a, const vector<int>& b);
     void kNearestNeighbourHelper(const vector<int>& target, int k, kDTreeNode* node, int depth, vector<pair<double, kDTreeNode*>>& nearestNeighbors);
-    void mergeSort_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int right);
-    void merge_kNearestNeighbour(vector<pair<double, kDTreeNode*>>& arr, int left, int mid, int right);
+    void mergeSort(vector<pair<double, kDTreeNode*>>& arr, int left, int right);
+    void merge(vector<pair<double, kDTreeNode*>>& arr, int left, int mid, int right);
 };
 
 class kNN
@@ -88,12 +96,18 @@ private:
     Dataset *X_train;
     Dataset *y_train;
     int numClasses;
+    kDTree* tree;
 
 public:
     kNN(int k = 5);
     void fit(Dataset &X_train, Dataset &y_train);
     Dataset predict(Dataset &X_test);
     double score(const Dataset &y_test, const Dataset &y_pred);
+
+    friend vector<vector<int>> convertToListVector(const list<list<int>>& listOfLists);
+    friend vector<int> flattenList(const list<list<int>>& nested_list);
 };
 
 // Please add more or modify as needed
+vector<vector<int>> convertToListVector(const list<list<int>>& listOfLists);
+vector<int> flattenList(const list<list<int>>& nested_list);
