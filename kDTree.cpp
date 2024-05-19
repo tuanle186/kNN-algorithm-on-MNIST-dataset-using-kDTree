@@ -137,6 +137,7 @@ void kDTree::preorderTraversal() const {
     preorderTraversalHelper(root, isFirst);
 }
 
+
 /* -------------------------------------------------------------------------- */
 /*                            Postorder Traversal                             */
 /* -------------------------------------------------------------------------- */
@@ -168,6 +169,7 @@ void kDTree::postorderTraversal() const {
     bool isFirst = true;
     postorderTraversalHelper(root, isFirst);
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                                  Height                                    */
@@ -505,6 +507,7 @@ kDTreeNode* kDTree::buildTreeHelper(const vector<vector<int>>& points, const vec
     return node;
 }
 
+
 /* -------------------------------------------------------------------------- */
 /*                            Nearest Neighbour                               */
 /* -------------------------------------------------------------------------- */
@@ -674,6 +677,7 @@ void kDTree::mergeSort(vector<pair<double, kDTreeNode*>>& arr, int left, int rig
         merge(arr, left, mid, right);
     }
 }
+
 
 
 
