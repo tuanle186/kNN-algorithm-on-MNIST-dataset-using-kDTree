@@ -686,7 +686,7 @@ kNN::kNN(int k) {
     this->k = k;
     this->X_train = nullptr;
     this->y_train = nullptr;
-    this->numClasses = -1;
+    this->numClasses = 10;
     this->tree = nullptr;
 }
 
@@ -699,9 +699,9 @@ void kNN::fit(Dataset &X_train, Dataset &y_train) {
     vector<vector<int>> features = convertToListVector(X_train.data);
     vector<int> labels = flattenList(y_train.data);
     int numDims = X_train.data.front().size();
-    kDTree tree(numDims);
-    tree.buildTree(features, labels);
-    this->tree = &tree;
+    kDTree* tree = new kDTree(numDims);
+    tree->buildTree(features, labels);
+    this->tree = tree;
 }
 
 vector<vector<int>> convertToListVector(const list<list<int>>& listOfLists) {
@@ -725,15 +725,48 @@ vector<int> flattenList(const list<list<int>>& nested_list) {
     return flattened_list;
 }
 
+
 /* -------------------------------------------------------------------------- */
 /*                                Predict                                     */
 /* -------------------------------------------------------------------------- */
 
 Dataset kNN::predict(Dataset &X_test) {
-    Dataset myDataset;
-    return myDataset;
+    list<list<int>> X_test_data = X_test.data;
+    Dataset y_pred;
+    y_pred.columnName.push_back("label");
+    for (list<int>& point : X_test_data) {
+        vector<int> intVector(point.begin(), point.end());
+        vector<kDTreeNode*> bestList;
+        this->tree->kNearestNeighbour(intVector, this->k, bestList);
+        int mostCommonLabel = findMostCommonLabel(bestList);
+        list<int> newRow;
+        newRow.push_back(mostCommonLabel);
+        y_pred.data.push_back(newRow);
+    }
+    return y_pred;
 }
 
+int findMostCommonLabel(const std::vector<kDTreeNode*>& bestList) {
+    const int numClasses = 10;
+    vector<int> labelCounts(numClasses, 0);
+
+    // Count the occurrences of each label
+    for (kDTreeNode* node : bestList) {
+        if (*(node->label) >= 0 && *(node->label) < numClasses) {
+            labelCounts[*(node->label)]++;
+        }
+    }
+
+    // Find the label with the maximum count
+    int mostCommonLabel = 0;
+    for (int i = 1; i < numClasses; ++i) { // Start from 1
+        if (labelCounts[i] > labelCounts[mostCommonLabel]) {
+            mostCommonLabel = i;
+        }
+    }
+
+    return mostCommonLabel;
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                 Score                                      */

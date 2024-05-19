@@ -106,8 +106,10 @@ public:
 
     friend vector<vector<int>> convertToListVector(const list<list<int>>& listOfLists);
     friend vector<int> flattenList(const list<list<int>>& nested_list);
+    friend int findMostCommonLabel(const vector<kDTreeNode*>& bestList);
 };
 
 // Please add more or modify as needed
 vector<vector<int>> convertToListVector(const list<list<int>>& listOfLists);
 vector<int> flattenList(const list<list<int>>& nested_list);
+int findMostCommonLabel(const vector<kDTreeNode*>& bestList);
